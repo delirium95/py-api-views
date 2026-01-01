@@ -2,8 +2,6 @@ from django.urls import path, include
 from rest_framework import routers
 
 from cinema.views import (
-    movie_list,
-    movie_detail,
     GenreList,
     GenreDetail,
     ActorList,
@@ -12,31 +10,27 @@ from cinema.views import (
     MovieViewSet
 )
 
-# Створюємо роутер для ViewSet
-router = routers.DefaultRouter()
-router.register("cinema_halls", CinemaHallViewSet, basename="cinema-hall")
-# УВАГА: Не реєструємо movies тут, бо вони вже є через функції
+# Створюємо роутер для Movie (ModelViewSet)
+movie_router = routers.DefaultRouter()
+movie_router.register("movies", MovieViewSet, basename="movie")
+
+# Для CinemaHall теж використовуємо роутер
+cinema_hall_router = routers.DefaultRouter()
+cinema_hall_router.register("cinema_halls", CinemaHallViewSet, basename="cinema-hall")
 
 urlpatterns = [
-    # Всі URL мають префікс api/cinema/
+    # Базовий шлях api/cinema/
 
-    # Movies - через функції
-    path("api/cinema/movies/", movie_list, name="movie-list"),
-    path("api/cinema/movies/<int:pk>/", movie_detail, name="movie-detail"),
+    # Включаємо роутери для Movie та CinemaHall
+    path("api/cinema/", include(movie_router.urls)),
+    path("api/cinema/", include(cinema_hall_router.urls)),
 
-    # Genre - APIView
+    # Genre та Actor - окремі класи
     path("api/cinema/genres/", GenreList.as_view(), name="genre-list"),
-    path("api/cinema/genres/<int:pk>/",
-         GenreDetail.as_view(), name="genre-detail"),
+    path("api/cinema/genres/<int:pk>/", GenreDetail.as_view(), name="genre-detail"),
 
-    # Actor - GenericAPIView
-    path("api/cinema/actors/",
-         ActorList.as_view(), name="actor-list"),
-    path("api/cinema/actors/<int:pk>/",
-         ActorDetail.as_view(), name="actor-detail"),
-
-    # CinemaHall - GenericViewSet через роутер
-    path("api/cinema/", include(router.urls)),
+    path("api/cinema/actors/", ActorList.as_view(), name="actor-list"),
+    path("api/cinema/actors/<int:pk>/", ActorDetail.as_view(), name="actor-detail"),
 ]
 
 app_name = "cinema"
