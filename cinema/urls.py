@@ -10,24 +10,16 @@ from cinema.views import (
     MovieViewSet
 )
 
-# Створюємо роутер для Movie (ModelViewSet)
-movie_router = routers.DefaultRouter()
-movie_router.register("movies", MovieViewSet, basename="movie")
-
-# Для CinemaHall теж використовуємо роутер
-cinema_hall_router = routers.DefaultRouter()
-cinema_hall_router.register("cinema_halls",
-                            CinemaHallViewSet,
-                            basename="cinema-hall")
+# Створюємо роутер
+router = routers.DefaultRouter()
+router.register("movies", MovieViewSet, basename="movie")
+router.register("cinema_halls", CinemaHallViewSet, basename="cinema-hall")
 
 urlpatterns = [
     # Базовий шлях api/cinema/
+    path("api/cinema/", include(router.urls)),
 
-    # Включаємо роутери для Movie та CinemaHall
-    path("api/cinema/", include(movie_router.urls)),
-    path("api/cinema/", include(cinema_hall_router.urls)),
-
-    # Genre та Actor - окремі класи
+    # Додаємо окремо Genre та Actor
     path("api/cinema/genres/", GenreList.as_view(), name="genre-list"),
     path("api/cinema/genres/<int:pk>/",
          GenreDetail.as_view(),

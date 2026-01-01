@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from cinema.models import Movie, Actor, Genre, CinemaHall
+from .models import Actor, Genre, CinemaHall, Movie
 
 
 class ActorSerializer(serializers.ModelSerializer):
@@ -21,60 +20,20 @@ class CinemaHallSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "rows", "seats_in_row")
 
 
-class MovieSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    title = serializers.CharField(max_length=255)
-    description = serializers.CharField()
-    duration = serializers.IntegerField()
-    # ManyToMany fields - тільки IDs, без related serializers
-    actors = serializers.ListField(
-        child=serializers.IntegerField(),
-        write_only=True,  # тільки для створення/оновлення
-        required=False,
-        default=list
+class MovieSerializer(serializers.ModelSerializer):
+    # Для ManyToMany полів використовуємо PrimaryKeyRelatedField
+    actors = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Actor.objects.all(),
+        required=False  # Дозволяємо пустий список
     )
 
-    genres = serializers.ListField(
-        child=serializers.IntegerField(),
-        write_only=True,  # тільки для створення/оновлення
-        required=False,
-        default=list
+    genres = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Genre.objects.all(),
+        required=False  # Дозволяємо пустий список
     )
 
-    def create(self, validated_data):
-        # Вилучаємо ManyToMany дані
-        actors_ids = validated_data.pop("actors", [])
-        genres_ids = validated_data.pop("genres", [])
-
-        # Створюємо фільм
-        movie = Movie.objects.create(**validated_data)
-
-        # Додаємо зв'язки ManyToMany
-        if actors_ids:
-            movie.actors.add(*actors_ids)
-
-        if genres_ids:
-            movie.genres.add(*genres_ids)
-
-        return movie
-
-    def update(self, instance, validated_data):
-        # Вилучаємо ManyToMany дані
-        actors_ids = validated_data.pop("actors", None)
-        genres_ids = validated_data.pop("genres", None)
-
-        # Оновлюємо прості поля
-        instance.title = validated_data.get("title", instance.title)
-        instance.description = (validated_data.
-                                get("description", instance.description))
-        instance.duration = validated_data.get("duration", instance.duration)
-        instance.save()
-
-        # Оновлюємо ManyToMany зв'язки, якщо вони передані
-        if actors_ids is not None:
-            instance.actors.set(actors_ids)
-
-        if genres_ids is not None:
-            instance.genres.set(genres_ids)
-
-        return instance
+    class Meta:
+        model = Movie
+        fields = ("id", "title", "description", "actors", "genres", "duration")
