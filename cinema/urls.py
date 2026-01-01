@@ -15,23 +15,25 @@ from cinema.views import (
 # Створюємо роутер для ViewSet
 router = routers.DefaultRouter()
 router.register("cinema_halls", CinemaHallViewSet, basename="cinema-hall")
-router.register("movies", MovieViewSet, basename="movie")
+# УВАГА: Не реєструємо movies тут, бо вони вже є через функції
 
 urlpatterns = [
-    # Movies - через функції (для тестів)
-    path("movies/", movie_list, name="movie-list"),
-    path("movies/<int:pk>/", movie_detail, name="movie-detail"),
+    # Всі URL мають префікс api/cinema/
+
+    # Movies - через функції
+    path("api/cinema/movies/", movie_list, name="movie-list"),
+    path("api/cinema/movies/<int:pk>/", movie_detail, name="movie-detail"),
 
     # Genre - APIView
-    path("genres/", GenreList.as_view(), name="genre-list"),
-    path("genres/<int:pk>/", GenreDetail.as_view(), name="genre-detail"),
+    path("api/cinema/genres/", GenreList.as_view(), name="genre-list"),
+    path("api/cinema/genres/<int:pk>/", GenreDetail.as_view(), name="genre-detail"),
 
-    # Actor - GenericAPIView з міксінами
-    path("actors/", ActorList.as_view(), name="actor-list"),
-    path("actors/<int:pk>/", ActorDetail.as_view(), name="actor-detail"),
+    # Actor - GenericAPIView
+    path("api/cinema/actors/", ActorList.as_view(), name="actor-list"),
+    path("api/cinema/actors/<int:pk>/", ActorDetail.as_view(), name="actor-detail"),
 
-    # Включаємо URL з роутера (cinema_halls та movies через ViewSet)
-    path("", include(router.urls)),
+    # CinemaHall - GenericViewSet через роутер
+    path("api/cinema/", include(router.urls)),
 ]
 
 app_name = "cinema"
