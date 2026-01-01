@@ -32,7 +32,8 @@ urlpatterns = [
     # Actor - GenericAPIView
     path("api/cinema/actors/",
          ActorList.as_view(), name="actor-list"),
-    path("api/cinema/actors/<int:pk>/", ActorDetail.as_view(), name="actor-detail"),
+    path("api/cinema/actors/<int:pk>/",
+         ActorDetail.as_view(), name="actor-detail"),
 
     # CinemaHall - GenericViewSet через роутер
     path("api/cinema/", include(router.urls)),
