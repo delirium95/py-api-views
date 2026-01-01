@@ -26,10 +26,12 @@ urlpatterns = [
 
     # Genre - APIView
     path("api/cinema/genres/", GenreList.as_view(), name="genre-list"),
-    path("api/cinema/genres/<int:pk>/", GenreDetail.as_view(), name="genre-detail"),
+    path("api/cinema/genres/<int:pk>/",
+         GenreDetail.as_view(), name="genre-detail"),
 
     # Actor - GenericAPIView
-    path("api/cinema/actors/", ActorList.as_view(), name="actor-list"),
+    path("api/cinema/actors/",
+         ActorList.as_view(), name="actor-list"),
     path("api/cinema/actors/<int:pk>/", ActorDetail.as_view(), name="actor-detail"),
 
     # CinemaHall - GenericViewSet через роутер
