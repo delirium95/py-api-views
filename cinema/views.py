@@ -106,7 +106,7 @@ class CinemaHallViewSet(
     serializer_class = CinemaHallSerializer
 
 
-# 4. Movie - ModelViewSet (ВИДАЛИТИ функції movie_list та movie_detail!)
+# 4. Movie - ModelViewSet
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
